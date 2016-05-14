@@ -22,7 +22,7 @@
 # It is assumed that deliminators between prices will not be a digit, dot or comma
 # It is also assumed that no valid price will be immediately followed by a dot or comma
 
-from re import compile, X
+from re import compile, X, S
 from sys import argv, exit
 
 FILE = 1
@@ -47,18 +47,31 @@ except IndexError:
     print('P3.py <file1>.txt')
     exit()
 
-price = compile(r"""
+normalize = compile(r'''^           # Start of file
+                        .*?         # Zero or more of any character or newline
+                        (?<!\. | ,)
+                        (?<!\d)
+                        (-?\d)
+                        (?!\d | ,\d | \.\d)
+                        .*
+                        $           # End of file''', X | S)
+
+price = compile(r'''
                      \$              # Start of a valid price signified by dollar sign
                                      # First capturing group:
                      ([1-9]\d{0,2})  #     Price must start with a non-zero digit, followed optionally by
                                      #     one or two other digits
                                    # Optional comma for thousands formatting
                                      # Second capturing group:
-                     ((?:,\d{3})*)        #     Optional three more digits to support prices up to $999,999
+                     ((?:,\d{3})*)   #     Optional three more digits to support prices up to $999,999
                                      # Third capturing group:
                      (\.\d\d)?       #     The cent portion of the price is optional, one dot and two any digits match
                                      # Negative Lookahead:
-                     (?![\d])      #     Reject the price if the cent portion has an extra digit, dot or comma """, X)
+                     (?![\d])      #  Reject the price if the cent portion has an extra digit, dot or comma ''', X)
+
+#Find normalization digit
+normalization_digit = normalize.findall(string)
+print(normalization_digit)
 
 # Find all valid prices
 valid_prices = price.findall(string)
@@ -71,7 +84,7 @@ for price in bucks:
     b.write(PREFIX)
     b.write(price[THOUSANDS])
     if price[HUNDREDS] != EMPTY:
-        b.write(SEPARATOR)
+        #b.write(SEPARATOR)
         b.write(price[HUNDREDS])
     b.write(DELIM)
 b.close()
@@ -83,7 +96,7 @@ for price in sale:
     s.write(PREFIX)
     s.write(price[THOUSANDS])
     if price[HUNDREDS] != EMPTY:
-        s.write(SEPARATOR)
+        #s.write(SEPARATOR)
         s.write(price[HUNDREDS])
     s.write(price[CENTS])
     s.write(DELIM)
@@ -96,7 +109,7 @@ for price in misc:
     m.write(PREFIX)
     m.write(price[THOUSANDS])
     if price[HUNDREDS] != EMPTY:
-        m.write(SEPARATOR)
+        #m.write(SEPARATOR)
         m.write(price[HUNDREDS])
     m.write(price[CENTS])
     m.write(DELIM)

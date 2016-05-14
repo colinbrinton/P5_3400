@@ -1,5 +1,7 @@
 Hello, the is the testing file, don’t forget that there can be other stuff in here!
 
+Some more stuff 5.7 3,345 here is a digit -35 34 $53 3242 6 23 3,345.
+
 $10,000.00
 $10,000.99
 $110,000.00
