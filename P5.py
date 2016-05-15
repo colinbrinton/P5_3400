@@ -29,6 +29,7 @@ FILE = 1
 THOUSANDS = 0
 HUNDREDS = 1
 CENTS = 2
+DIGIT = 0
 SALE = '.99'
 OUTPUT1 = 'bucks.txt'
 OUTPUT2 = 'sale.txt'
@@ -69,13 +70,20 @@ price = compile(r'''
                                      # Negative Lookahead:
                      (?![\d])      #  Reject the price if the cent portion has an extra digit, dot or comma ''', X)
 
-#Find normalization digit
-normalization_digit = normalize.findall(string)
+# Find normalization digit
+normalization_digit = int(normalize.findall(string)[DIGIT])
 print(normalization_digit)
 
 # Find all valid prices
 valid_prices = price.findall(string)
 print(valid_prices)
+
+for price in valid_prices:
+    number = EMPTY.join(str(group) for group in price)
+    strip_number = float(number.replace(SEPARATOR, EMPTY))
+    normalized_number = round((strip_number / normalization_digit), CENTS)
+    print(normalized_number)
+
 
 # Find prices in $x format, output prices to bucks file
 bucks = [price for price in valid_prices if not price[CENTS]]
